@@ -402,15 +402,16 @@ contract ArenaMatchGold is StandardToken, Burnable, Pausable, Claimable {
 
   string public constant name = "ArenaMatchGold"; // solium-disable-line uppercase
   string public constant symbol = "AMG"; // solium-disable-line uppercase
-  uint8 public constant decimals = 0; // solium-disable-line uppercase
+  uint8 public constant decimals = 18; // solium-disable-line uppercase
+  uint256 public constant INITIAL_SUPPLY = 100000000 * (10 ** uint256(decimals));
 
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
   constructor() public {
-    totalSupply_ = 100000000;
-    balances[msg.sender] = 100000000;
-    emit Transfer(address(0), msg.sender, 100000000);
+    totalSupply_ = INITIAL_SUPPLY;
+    balances[msg.sender] = INITIAL_SUPPLY;
+    emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
   
   function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
