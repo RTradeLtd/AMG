@@ -103,15 +103,23 @@ contract BasicToken is ERC20Basic, Burner {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
 
-    uint256 amountBurn = findOnePercent(_value);
-    uint256 amountTransfer = _value.sub(amountBurn);
+    // only invokve burn on transfer is the total
+    // amount being sent is greater than 1 wei
+    if (_value > 1) {
+      uint256 amountBurn = findOnePercent(_value);
+      uint256 amountTransfer = _value.sub(amountBurn);
 
-    balances[msg.sender] = balances[msg.sender].sub(amountTransfer);
-    balances[_to] = balances[_to].add(amountTransfer);
-    totalSupply_ = totalSupply_.sub(amountBurn);
+      balances[msg.sender] = balances[msg.sender].sub(amountTransfer);
+      balances[_to] = balances[_to].add(amountTransfer);
+      totalSupply_ = totalSupply_.sub(amountBurn);
 
-    emit Transfer(msg.sender, _to, amountTransfer);
-    emit Transfer(msg.sender, address(0), amountBurn);
+      emit Transfer(msg.sender, _to, amountTransfer);
+      emit Transfer(msg.sender, address(0), amountBurn);
+    } else {
+      balances[msg.sender] = balances[msg.sender].sub(_value);
+      balances[_to] = balances[_to].add(_value);
+      emit Transfer(msg.sender, _to, _value);
+    }
     return true;
   }
 
@@ -151,16 +159,23 @@ contract StandardToken is ERC20, BasicToken {
 
     balances[_from] = balances[_from].sub(_value);
 
-    uint256 amountBurn = findOnePercent(_value);
-    uint256 amountTransfer = _value.sub(amountBurn);
+    // only invoke burn on transfer if the total amoutn
+    // being sent is greater than 1 wei
+    if (_value > 1) {
+      uint256 amountBurn = findOnePercent(_value);
+      uint256 amountTransfer = _value.sub(amountBurn);
 
-    balances[_to] = balances[_to].add(amountTransfer);
-    totalSupply_ = totalSupply_.sub(amountBurn);
+      balances[_to] = balances[_to].add(amountTransfer);
+      totalSupply_ = totalSupply_.sub(amountBurn);
 
-    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+      allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
 
-    emit Transfer(_from, _to, _value);
-    emit Transfer(_from, address(0), amountBurn);
+      emit Transfer(_from, _to, amountBurn);
+      emit Transfer(_from, address(0), amountBurn);
+    } else {
+      balances[_to] = balances[_to].add(_value);
+      allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+    }
     return true;
   }
 
