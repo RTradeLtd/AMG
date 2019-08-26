@@ -106,7 +106,7 @@ contract BasicToken is ERC20Basic, Burner {
     uint256 amountBurn = findOnePercent(_value);
     uint256 amountTransfer = _value.sub(amountBurn);
 
-    balances[msg.sender] = balances[msg.sender].sub(amountTransfer);
+    balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(amountTransfer);
     totalSupply_ = totalSupply_.sub(amountBurn);
 
